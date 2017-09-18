@@ -1,0 +1,1 @@
+cats = require('./Shikaku.js');
