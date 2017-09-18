@@ -1,1 +1,4 @@
-cats = require('./Shikaku.js');
+import Shikaku from './Shikaku.js';
+
+/* Démarrage */
+new Shikaku();

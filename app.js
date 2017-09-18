@@ -65,16 +65,81 @@
 /************************************************************************/
 /******/ ([
 /* 0 */
-/***/ (function(module, exports, __webpack_require__) {
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
 
-cats = __webpack_require__(2);
+"use strict";
+Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__Shikaku_js__ = __webpack_require__(1);
+
+
+/* Démarrage */
+new __WEBPACK_IMPORTED_MODULE_0__Shikaku_js__["a" /* default */]();
 
 /***/ }),
-/* 1 */,
-/* 2 */
-/***/ (function(module, exports) {
+/* 1 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
 
-throw new Error("Module build failed: Error: ENOENT: no such file or directory, open 'F:\\Projects\\Web Projects\\shikaku-proto\\js\\Shikaku.js'\n    at Error (native)");
+"use strict";
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__Grid__ = __webpack_require__(2);
+/**
+ * Classe qui gère l'appli
+ */
+
+
+class Shikaku {
+
+    constructor() {
+        /* Ajout des listeners sur les boutons */
+        let btns = document.querySelectorAll('button');
+        for (let btn of btns)
+            btn.addEventListener('click', (e) => this.createGrid(e), false);
+    }
+
+    /**
+     * Bouton cliqué, création de la grille
+     *
+     * @param e
+     */
+    createGrid(e) {
+        let number = e.currentTarget.value;
+        new __WEBPACK_IMPORTED_MODULE_0__Grid__["a" /* default */](number);
+    }
+}
+/* harmony export (immutable) */ __webpack_exports__["a"] = Shikaku;
+
+
+/***/ }),
+/* 2 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/**
+ * Gestion de la grille
+ */
+class Grid {
+
+    constructor(number) {
+
+        this.number = number;
+        this.gridElem = document.querySelector('.grid');
+
+        let table = document.createElement("TABLE");
+        for (let i = 0; i < number; ++i) {
+
+            let tr = document.createElement("TR");
+            for (let j = 0; j < number; ++j) {
+                tr.appendChild(document.createElement("TD"));
+            }
+
+            table.appendChild(tr);
+        }
+
+        this.gridElem.innerHTML = "";
+        this.gridElem.appendChild(table);
+    }
+}
+/* harmony export (immutable) */ __webpack_exports__["a"] = Grid;
+
 
 /***/ })
 /******/ ]);
