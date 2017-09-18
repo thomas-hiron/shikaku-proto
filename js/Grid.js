@@ -31,7 +31,7 @@ export default class Grid {
 
         while (true) {
 
-            /* Génération d'un rectangle, pas plus d'un tier de la grille */
+            /* Génération d'un rectangle */
             let width = parseInt(Math.random() * this.number) + 1;
             let height = parseInt(Math.random() * this.number) + 1;
             let area = width * height;
@@ -42,51 +42,20 @@ export default class Grid {
                 continue;
             }
 
-            let table = this.gridElem.firstElementChild;
-
             /* Récupération des prochaines cases dispo */
-            let i = 0;
-            let j = 0;
-            table:
-                for (let tr of table.children) {
-                    for (let td of tr.children) {
-                        /* Assez de place */
-                        if (td.style.backgroundColor === "") {
-                            break table;
-                        }
-
-                        ++i;
-                    }
-
-                    ++j;
-                    i = 0;
-                }
+            let [i, j] = this.getNextUnoccupied();
 
             /* Assignation pour décalage */
             let startX = i;
             let startY = j;
 
-            /* Vérif assez de place dispo */
-            let canAdd = true;
-            add:
-                for (i = startX; i < width + startX; ++i) {
-                    for (j = startY; j < height + startY; ++j) {
-                        try {
-                            if (table.children[j].children[i].style.backgroundColor !== "") {
-                                canAdd = false;
-                                break add;
-                            }
-                        }
-                        catch (e) {
-                            canAdd = false;
-                            break add;
-                        }
-                    }
-                }
+            /* Vérif assez de place dispo (pas de chevauchement ou de sortie de grille */
+            let canAdd = this.canAdd(startX, startY, width, height);
 
-            /* Ajout sans chevauchement ou case déjà remplie */
+            /* Ajout */
             if (canAdd) {
                 let color = "#" + ((1 << 24) * Math.random() | 0).toString(16);
+                let table = this.gridElem.firstElementChild;
                 for (i = startX; i < width + startX; ++i) {
                     for (j = startY; j < height + startY; ++j) {
                         table.children[j].children[i].style.backgroundColor = color;
@@ -95,20 +64,85 @@ export default class Grid {
             }
 
             /* Stoppage de la boucle */
-            let stop = true;
-            stop:
-                for (let tr of table.children) {
-                    for (let td of tr.children) {
-                        if (td.style.backgroundColor === "") {
-                            stop = false;
-                            break stop;
-                        }
-                    }
-                }
-
-            if (stop) {
+            if (this.gridFull()) {
                 break;
             }
         }
+    }
+
+    /**
+     * Récupère les coords de la prochaine case non occupée
+     *
+     * @returns {[int,int]}
+     */
+    getNextUnoccupied() {
+
+        let table = this.gridElem.firstElementChild;
+        let i = 0;
+        let j = 0;
+        table:
+            for (let tr of table.children) {
+                for (let td of tr.children) {
+                    /* Assez de place */
+                    if (td.style.backgroundColor === "") {
+                        break table;
+                    }
+
+                    ++i;
+                }
+
+                ++j;
+                i = 0;
+            }
+
+        return [i, j];
+    }
+
+    /**
+     * Si on peut ajouter le rectangle aux coords en param et à la taille
+     *
+     * @param startX
+     * @param startY
+     * @param width
+     * @param height
+     *
+     * @returns {boolean}
+     */
+    canAdd(startX, startY, width, height) {
+
+        let table = this.gridElem.firstElementChild;
+        for (let i = startX; i < width + startX; ++i) {
+            for (let j = startY; j < height + startY; ++j) {
+                try {
+                    if (table.children[j].children[i].style.backgroundColor !== "") {
+                        return false;
+                    }
+                }
+                catch (e) {
+                    return false;
+                }
+            }
+        }
+
+        return true;
+    }
+
+    /**
+     * Si la grille est complète
+     *
+     * @returns {boolean}
+     */
+    gridFull() {
+
+        let table = this.gridElem.firstElementChild;
+        for (let tr of table.children) {
+            for (let td of tr.children) {
+                if (td.style.backgroundColor === "") {
+                    return false;
+                }
+            }
+        }
+
+        return true;
     }
 }
