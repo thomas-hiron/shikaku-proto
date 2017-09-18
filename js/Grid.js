@@ -30,26 +30,80 @@ export default class Grid {
     addRectangles() {
 
         while (true) {
+
             /* Génération d'un rectangle, pas plus d'un tier de la grille */
             let width = parseInt(Math.random() * this.number) + 1;
             let height = parseInt(Math.random() * this.number) + 1;
             let area = width * height;
             let totalArea = this.number * this.number;
 
-            /* Pas plus d'1/3 de la grille */
-            if (area / totalArea > 1 / 3) {
+            /* Pas plus de la moitiée de la grille */
+            if (area / totalArea > 1 / 2) {
                 continue;
             }
 
             let table = this.gridElem.firstElementChild;
-            for (let i = 0; i < width; ++i) {
 
-                for (let j = 0; j < height; ++j) {
-                    table.children[j].children[i].classList.add('bg');
+            /* Récupération des prochaines cases dispo */
+            let i = 0;
+            let j = 0;
+            table:
+                for (let tr of table.children) {
+                    for (let td of tr.children) {
+                        /* Assez de place */
+                        if (td.style.backgroundColor === "") {
+                            break table;
+                        }
+
+                        ++i;
+                    }
+
+                    ++j;
+                    i = 0;
+                }
+
+            /* Assignation pour décalage */
+            let startX = i;
+            let startY = j;
+
+            /* Vérif assez de place dispo */
+            let canAdd = true;
+            for (i = startX; i < width + startX; ++i) {
+                for (j = startY; j < height + startY; ++j) {
+                    try {
+                        if (table.children[j].children[i].style.backgroundColor !== "") {
+                            canAdd = false;
+                        }
+                    }
+                    catch (e) {
+                        canAdd = false;
+                    }
                 }
             }
 
-            break;
+            /* Ajout sans chevauchement ou case déjà remplie */
+            if (canAdd) {
+                let color = "#" + ((1 << 24) * Math.random() | 0).toString(16);
+                for (i = startX; i < width + startX; ++i) {
+                    for (j = startY; j < height + startY; ++j) {
+                        table.children[j].children[i].style.backgroundColor = color;
+                    }
+                }
+            }
+
+            /* Stoppage de la boucle */
+            let stop = true;
+            for (let tr of table.children) {
+                for (let td of tr.children) {
+                    if (td.style.backgroundColor === "") {
+                        stop = false;
+                    }
+                }
+            }
+
+            if (stop) {
+                break;
+            }
         }
     }
 }
