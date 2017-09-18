@@ -89,6 +89,9 @@ new __WEBPACK_IMPORTED_MODULE_0__Shikaku_js__["a" /* default */]();
 class Shikaku {
 
     constructor() {
+
+        this.grid = null;
+
         /* Ajout des listeners sur les boutons */
         let btns = document.querySelectorAll('button');
         for (let btn of btns)
@@ -101,8 +104,12 @@ class Shikaku {
      * @param e
      */
     createGrid(e) {
+
         let number = e.currentTarget.value;
-        new __WEBPACK_IMPORTED_MODULE_0__Grid__["a" /* default */](number);
+        this.grid = new __WEBPACK_IMPORTED_MODULE_0__Grid__["a" /* default */](number);
+
+        /* Ajout des rectangles */
+        this.grid.addRectangles();
     }
 }
 /* harmony export (immutable) */ __webpack_exports__["a"] = Shikaku;
@@ -123,11 +130,12 @@ class Grid {
         this.number = number;
         this.gridElem = document.querySelector('.grid');
 
+        /* Création de la grille */
         let table = document.createElement("TABLE");
-        for (let i = 0; i < number; ++i) {
+        for (let i = 0; i < this.number; ++i) {
 
             let tr = document.createElement("TR");
-            for (let j = 0; j < number; ++j) {
+            for (let j = 0; j < this.number; ++j) {
                 tr.appendChild(document.createElement("TD"));
             }
 
@@ -136,6 +144,36 @@ class Grid {
 
         this.gridElem.innerHTML = "";
         this.gridElem.appendChild(table);
+    }
+
+    /**
+     * Ajoute les rectangles
+     */
+    addRectangles() {
+
+        while (true) {
+            /* Génération d'un rectangle, pas plus d'un tier de la grille */
+            let width = parseInt(Math.random() * this.number) + 1;
+            let height = parseInt(Math.random() * this.number) + 1;
+            let area = width * height;
+            let totalArea = this.number * this.number;
+
+            /* Pas plus d'1/3 de la grille */
+            if (area / totalArea > 1 / 3) {
+                continue;
+            }
+
+            let table = this.gridElem.firstElementChild;
+            console.log(width, height);
+            for (let i = 0; i < width; ++i) {
+
+                for (let j = 0; j < height; ++j) {
+                    table.children[j].children[i].classList.add('bg');
+                }
+            }
+
+            break;
+        }
     }
 }
 /* harmony export (immutable) */ __webpack_exports__["a"] = Grid;

@@ -21,7 +21,11 @@ export default class Shikaku {
      * @param e
      */
     createGrid(e) {
+
         let number = e.currentTarget.value;
         this.grid = new Grid(number);
+
+        /* Ajout des rectangles */
+        this.grid.addRectangles();
     }
 }
