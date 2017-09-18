@@ -68,18 +68,21 @@ export default class Grid {
 
             /* Vérif assez de place dispo */
             let canAdd = true;
-            for (i = startX; i < width + startX; ++i) {
-                for (j = startY; j < height + startY; ++j) {
-                    try {
-                        if (table.children[j].children[i].style.backgroundColor !== "") {
+            add:
+                for (i = startX; i < width + startX; ++i) {
+                    for (j = startY; j < height + startY; ++j) {
+                        try {
+                            if (table.children[j].children[i].style.backgroundColor !== "") {
+                                canAdd = false;
+                                break add;
+                            }
+                        }
+                        catch (e) {
                             canAdd = false;
+                            break add;
                         }
                     }
-                    catch (e) {
-                        canAdd = false;
-                    }
                 }
-            }
 
             /* Ajout sans chevauchement ou case déjà remplie */
             if (canAdd) {
@@ -93,13 +96,15 @@ export default class Grid {
 
             /* Stoppage de la boucle */
             let stop = true;
-            for (let tr of table.children) {
-                for (let td of tr.children) {
-                    if (td.style.backgroundColor === "") {
-                        stop = false;
+            stop:
+                for (let tr of table.children) {
+                    for (let td of tr.children) {
+                        if (td.style.backgroundColor === "") {
+                            stop = false;
+                            break stop;
+                        }
                     }
                 }
-            }
 
             if (stop) {
                 break;
