@@ -9,39 +9,26 @@ export default class Grid {
         this.gridElem = document.querySelector('.grid');
 
         /* Création de la grille */
-        let table = document.createElement("TABLE");
-        for (let i = 0; i < this.number; ++i) {
-
-            let tr = document.createElement("TR");
-            for (let j = 0; j < this.number; ++j) {
-                tr.appendChild(document.createElement("TD"));
-            }
-
-            table.appendChild(tr);
-        }
-
-        this.gridElem.innerHTML = "";
-        this.gridElem.appendChild(table);
+        this.resetGrid();
     }
 
     /**
      * Ajoute les rectangles
+     *
+     * @param tryNumber Le nombre d'essai
      */
-    addRectangles() {
+    addRectangles(tryNumber = 0) {
 
-        while (true) {
+        let leftNumber = this.getLeftNumber();
 
-            /* Génération d'un rectangle */
-            let width = parseInt(Math.random() * this.number) + 1;
-            let height = parseInt(Math.random() * this.number) + 1;
-            let area = width * height;
-            let totalArea = this.number * this.number;
+        /* Génération d'un rectangle, pas plus de la moitié de la grille */
+        let width = parseInt(Math.random() * this.number / 2) + 1;
+        let height = parseInt(Math.random() * this.number / 2) + 1;
+        let area = width * height;
+        let totalArea = this.number * this.number;
 
-            /* Pas plus de la moitiée de la grille */
-            if (area / totalArea > 1 / 2) {
-                continue;
-            }
-
+        /* Pas de rectangle simple */
+        if (area !== 1) {
             /* Récupération des prochaines cases dispo */
             let [i, j] = this.getNextUnoccupied();
 
@@ -62,11 +49,17 @@ export default class Grid {
                     }
                 }
             }
-
-            /* Stoppage de la boucle */
-            if (this.gridFull()) {
-                break;
+        }
+        else {
+            /* Réinitialisation si trop d'essais */
+            if (tryNumber > Math.pow(this.number, 2)) {
+                tryNumber = 0;
+                this.resetGrid();
             }
+        }
+
+        if (!this.gridFull()) {
+            this.addRectangles(++tryNumber);
         }
     }
 
@@ -134,15 +127,48 @@ export default class Grid {
      */
     gridFull() {
 
+        return this.getLeftNumber() === 0;
+    }
+
+    /**
+     * Retourne le nombre de cases restantes
+     *
+     * @returns {boolean}
+     */
+    getLeftNumber() {
+
         let table = this.gridElem.firstElementChild;
+        let leftNumber = 0;
         for (let tr of table.children) {
             for (let td of tr.children) {
                 if (td.style.backgroundColor === "") {
-                    return false;
+                    ++leftNumber;
                 }
             }
         }
 
-        return true;
+        return leftNumber;
+    }
+
+    /**
+     * Réinitialise la grille
+     *
+     * @returns {boolean}
+     */
+    resetGrid() {
+
+        let table = document.createElement("TABLE");
+        for (let i = 0; i < this.number; ++i) {
+
+            let tr = document.createElement("TR");
+            for (let j = 0; j < this.number; ++j) {
+                tr.appendChild(document.createElement("TD"));
+            }
+
+            table.appendChild(tr);
+        }
+
+        this.gridElem.innerHTML = "";
+        this.gridElem.appendChild(table);
     }
 }
