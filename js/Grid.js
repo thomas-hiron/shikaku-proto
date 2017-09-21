@@ -42,7 +42,7 @@ export default class Grid {
             /* Ajout */
             if (canAdd) {
                 let color = "#" + ((1 << 24) * Math.random() | 0).toString(16);
-                let table = this.gridElem.firstElementChild;
+                let grid = this.gridElem.firstElementChild;
                 /* Un numéro de case aléatoire et le nombre de cases ajoutées */
                 let rand = parseInt(Math.random() * area) + 1;
                 let number = 0;
@@ -51,11 +51,11 @@ export default class Grid {
 
                         /* Affichage du nombre et de la couleur */
                         if (++number === rand) {
-                            table.children[j].children[i].style.backgroundColor = color;
-                            table.children[j].children[i].setAttribute('data-content', area);
+                            grid.children[j].children[i].style.backgroundColor = color;
+                            grid.children[j].children[i].setAttribute('data-content', area);
                         }
                         else {
-                            table.children[j].children[i].style.backgroundColor = '#fff';
+                            grid.children[j].children[i].style.backgroundColor = '#fff';
                         }
                     }
                 }
@@ -69,8 +69,14 @@ export default class Grid {
             }
         }
 
+        /* Encore de la place, rajout */
         if (!this.gridFull()) {
             this.addRectangles(++tryNumber);
+        }
+        /* Début de la partie */
+        else {
+            let event = new CustomEvent("StartGame");
+            document.dispatchEvent(event);
         }
     }
 
@@ -81,15 +87,15 @@ export default class Grid {
      */
     getNextUnoccupied() {
 
-        let table = this.gridElem.firstElementChild;
+        let grid = this.gridElem.firstElementChild;
         let i = 0;
         let j = 0;
-        table:
-            for (let tr of table.children) {
+        grid:
+            for (let tr of grid.children) {
                 for (let td of tr.children) {
                     /* Assez de place */
                     if (td.style.backgroundColor === "") {
-                        break table;
+                        break grid;
                     }
 
                     ++i;
@@ -114,11 +120,11 @@ export default class Grid {
      */
     canAdd(startX, startY, width, height) {
 
-        let table = this.gridElem.firstElementChild;
+        let grid = this.gridElem.firstElementChild;
         for (let i = startX; i < width + startX; ++i) {
             for (let j = startY; j < height + startY; ++j) {
                 try {
-                    if (table.children[j].children[i].style.backgroundColor !== "") {
+                    if (grid.children[j].children[i].style.backgroundColor !== "") {
                         return false;
                     }
                 }
@@ -148,9 +154,9 @@ export default class Grid {
      */
     getLeftNumber() {
 
-        let table = this.gridElem.firstElementChild;
+        let grid = this.gridElem.firstElementChild;
         let leftNumber = 0;
-        for (let tr of table.children) {
+        for (let tr of grid.children) {
             for (let td of tr.children) {
                 if (td.style.backgroundColor === "") {
                     ++leftNumber;
@@ -168,7 +174,7 @@ export default class Grid {
      */
     resetGrid() {
 
-        let table = document.createElement("TABLE");
+        let grid = document.createElement("TABLE");
         for (let i = 0; i < this.number; ++i) {
 
             let tr = document.createElement("TR");
@@ -176,10 +182,10 @@ export default class Grid {
                 tr.appendChild(document.createElement("TD"));
             }
 
-            table.appendChild(tr);
+            grid.appendChild(tr);
         }
 
         this.gridElem.innerHTML = "";
-        this.gridElem.appendChild(table);
+        this.gridElem.appendChild(grid);
     }
 }
