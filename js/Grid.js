@@ -43,9 +43,20 @@ export default class Grid {
             if (canAdd) {
                 let color = "#" + ((1 << 24) * Math.random() | 0).toString(16);
                 let table = this.gridElem.firstElementChild;
+                /* Un numéro de case aléatoire et le nombre de cases ajoutées */
+                let rand = parseInt(Math.random() * area) + 1;
+                let number = 0;
                 for (i = startX; i < width + startX; ++i) {
                     for (j = startY; j < height + startY; ++j) {
-                        table.children[j].children[i].style.backgroundColor = color;
+
+                        /* Affichage du nombre et de la couleur */
+                        if (++number === rand) {
+                            table.children[j].children[i].style.backgroundColor = color;
+                            table.children[j].children[i].setAttribute('data-content', area);
+                        }
+                        else {
+                            table.children[j].children[i].style.backgroundColor = '#fff';
+                        }
                     }
                 }
             }
