@@ -2,6 +2,7 @@
  * Classe qui gère l'appli
  */
 import Grid from "./Grid";
+import DrawManager from "./DrawManager";
 
 export default class Shikaku {
 
@@ -13,6 +14,9 @@ export default class Shikaku {
         let btns = document.querySelectorAll('button');
         for (let btn of btns)
             btn.addEventListener('click', (e) => this.createGrid(e), false);
+
+        /* Début de partie */
+        let drawManager = new DrawManager();
     }
 
     /**

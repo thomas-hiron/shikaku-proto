@@ -81,9 +81,11 @@ new __WEBPACK_IMPORTED_MODULE_0__Shikaku_js__["a" /* default */]();
 
 "use strict";
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__Grid__ = __webpack_require__(2);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__DrawManager__ = __webpack_require__(3);
 /**
  * Classe qui gère l'appli
  */
+
 
 
 class Shikaku {
@@ -96,6 +98,9 @@ class Shikaku {
         let btns = document.querySelectorAll('button');
         for (let btn of btns)
             btn.addEventListener('click', (e) => this.createGrid(e), false);
+
+        /* Début de partie */
+        let drawManager = new __WEBPACK_IMPORTED_MODULE_1__DrawManager__["a" /* default */]();
     }
 
     /**
@@ -164,7 +169,7 @@ class Grid {
             /* Ajout */
             if (canAdd) {
                 let color = "#" + ((1 << 24) * Math.random() | 0).toString(16);
-                let table = this.gridElem.firstElementChild;
+                let grid = this.gridElem.firstElementChild;
                 /* Un numéro de case aléatoire et le nombre de cases ajoutées */
                 let rand = parseInt(Math.random() * area) + 1;
                 let number = 0;
@@ -173,11 +178,11 @@ class Grid {
 
                         /* Affichage du nombre et de la couleur */
                         if (++number === rand) {
-                            table.children[j].children[i].style.backgroundColor = color;
-                            table.children[j].children[i].setAttribute('data-content', area);
+                            grid.children[j].children[i].style.backgroundColor = color;
+                            grid.children[j].children[i].setAttribute('data-content', area);
                         }
                         else {
-                            table.children[j].children[i].style.backgroundColor = '#fff';
+                            grid.children[j].children[i].style.backgroundColor = '#fff';
                         }
                     }
                 }
@@ -191,6 +196,7 @@ class Grid {
             }
         }
 
+        /* Encore de la place, rajout */
         if (!this.gridFull()) {
             this.addRectangles(++tryNumber);
         }
@@ -203,15 +209,15 @@ class Grid {
      */
     getNextUnoccupied() {
 
-        let table = this.gridElem.firstElementChild;
+        let grid = this.gridElem.firstElementChild;
         let i = 0;
         let j = 0;
-        table:
-            for (let tr of table.children) {
+        grid:
+            for (let tr of grid.children) {
                 for (let td of tr.children) {
                     /* Assez de place */
                     if (td.style.backgroundColor === "") {
-                        break table;
+                        break grid;
                     }
 
                     ++i;
@@ -236,11 +242,11 @@ class Grid {
      */
     canAdd(startX, startY, width, height) {
 
-        let table = this.gridElem.firstElementChild;
+        let grid = this.gridElem.firstElementChild;
         for (let i = startX; i < width + startX; ++i) {
             for (let j = startY; j < height + startY; ++j) {
                 try {
-                    if (table.children[j].children[i].style.backgroundColor !== "") {
+                    if (grid.children[j].children[i].style.backgroundColor !== "") {
                         return false;
                     }
                 }
@@ -270,9 +276,9 @@ class Grid {
      */
     getLeftNumber() {
 
-        let table = this.gridElem.firstElementChild;
+        let grid = this.gridElem.firstElementChild;
         let leftNumber = 0;
-        for (let tr of table.children) {
+        for (let tr of grid.children) {
             for (let td of tr.children) {
                 if (td.style.backgroundColor === "") {
                     ++leftNumber;
@@ -290,7 +296,7 @@ class Grid {
      */
     resetGrid() {
 
-        let table = document.createElement("TABLE");
+        let grid = document.createElement("TABLE");
         for (let i = 0; i < this.number; ++i) {
 
             let tr = document.createElement("TR");
@@ -298,14 +304,126 @@ class Grid {
                 tr.appendChild(document.createElement("TD"));
             }
 
-            table.appendChild(tr);
+            grid.appendChild(tr);
         }
 
         this.gridElem.innerHTML = "";
-        this.gridElem.appendChild(table);
+        this.gridElem.appendChild(grid);
     }
 }
 /* harmony export (immutable) */ __webpack_exports__["a"] = Grid;
+
+
+/***/ }),
+/* 3 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+class DrawManager {
+
+    constructor() {
+
+        let grid = document.querySelector('.grid');
+
+        /* La couleur pour dessiner */
+        this.color = null;
+
+        /* Ajout du listener mousedown */
+        grid.addEventListener('mousedown', (e) => this.onMouseDown(e), false);
+
+        /* Ajout du listener mouseup */
+        grid.addEventListener('mouseup', (e) => this.onMouseUp(e), false);
+
+        /* Ajout du listener mousemove */
+        grid.addEventListener('mousemove', (e) => this.onMouseMove(e), false);
+    }
+
+    /**
+     * Mousedown, init de la couleur qui va permettre de dessiner
+     *
+     * @param e
+     */
+    onMouseDown(e) {
+
+        e.preventDefault();
+        let bgc = e.target.style.backgroundColor;
+
+        /* Si pas de blanc */
+        if (!bgc.match(/(.*255){3}/)) {
+            this.color = bgc;
+        }
+    }
+
+    /**
+     * Mouseup, plus de dessin
+     *
+     * @param e
+     */
+    onMouseUp(e) {
+
+        this.color = null;
+    }
+
+    /**
+     * Mousemove, on dessine
+     *
+     * @param e
+     */
+    onMouseMove(e) {
+
+        /* Pour pas dessiner sur les blocs fixes */
+        if (e.target.getAttribute('data-content') === null && this.color !== null && e.target.nodeName === "TD") {
+
+            /* Vérification des cases adjacentes */
+            let hasAdjacentWithSameColor = false;
+            let adjacents = this.getAdjacentsTiles(e.target);
+            for (let adjacent of adjacents) {
+
+                if (adjacent.style.backgroundColor === this.color) {
+                    hasAdjacentWithSameColor = true;
+                }
+            }
+
+            if (hasAdjacentWithSameColor) {
+                e.target.style.backgroundColor = this.color;
+            }
+        }
+    }
+
+    /**
+     * Récupère les cases à côté
+     *
+     * @param elem
+     *
+     * @returns {Array}
+     */
+    getAdjacentsTiles(elem) {
+
+        let adjacents = [];
+
+        /* Gauche et droite */
+        if (elem.previousElementSibling !== null) {
+            adjacents.push(elem.previousElementSibling);
+        }
+        if (elem.nextElementSibling !== null) {
+            adjacents.push(elem.nextElementSibling);
+        }
+
+        let parent = elem.parentNode;
+        let index = Array.prototype.indexOf.call(parent.childNodes, elem);
+
+        /* Haut et bas */
+        if (parent.previousElementSibling !== null) {
+            adjacents.push(parent.previousElementSibling.children[index]);
+        }
+        if (parent.nextElementSibling !== null) {
+            adjacents.push(parent.nextElementSibling.children[index]);
+        }
+
+        return adjacents;
+    }
+}
+/* harmony export (immutable) */ __webpack_exports__["a"] = DrawManager;
 
 
 /***/ })
