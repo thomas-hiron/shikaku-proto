@@ -73,6 +73,11 @@ export default class Grid {
         if (!this.gridFull()) {
             this.addRectangles(++tryNumber);
         }
+        /* Début de la partie */
+        else {
+            let event = new CustomEvent('StartGame');
+            document.dispatchEvent(event);
+        }
     }
 
     /**
@@ -145,7 +150,7 @@ export default class Grid {
     /**
      * Retourne le nombre de cases restantes
      *
-     * @returns {boolean}
+     * @returns {number}
      */
     getLeftNumber() {
 

@@ -3,6 +3,7 @@
  */
 import Grid from "./Grid";
 import DrawManager from "./DrawManager";
+import GameManager from "./GameManager";
 
 export default class Shikaku {
 
@@ -15,8 +16,10 @@ export default class Shikaku {
         for (let btn of btns)
             btn.addEventListener('click', (e) => this.createGrid(e), false);
 
-        /* Début de partie */
-        let drawManager = new DrawManager();
+        /* Gestion du dessin */
+        new DrawManager();
+        /* Gestion de la partie */
+        new GameManager();
     }
 
     /**

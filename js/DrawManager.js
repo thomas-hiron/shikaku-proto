@@ -1,3 +1,6 @@
+/**
+ * Classe qui gère le dessin des cases
+ */
 export default class DrawManager {
 
     constructor() {

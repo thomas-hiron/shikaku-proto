@@ -12,6 +12,10 @@ td {
     font-weight: bold;
 }
 
+td.big {
+    font-size: 2em;
+}
+
 td:after {
     content: attr(data-content);
 }
